@@ -11,7 +11,7 @@ use prettytable::{Attr, Table, Cell, Row, row, cell, color};
 use serde::export::Formatter;
 
 #[derive(Debug, StructOpt)]
-#[structopt(name = "port-tester", about = "An example of StructOpt usage.")]
+#[structopt(name = "port-tester", about = "Oblakogroup port tester")]
 struct Opt {
     /// manifest url
     #[structopt(short, long)]
@@ -206,7 +206,7 @@ fn main() {
 
     // Fancy output
     let mut table = Table::new();
-    table.add_row(row!["Port", "Protocol", "Status", "Error"]);
+    table.add_row(row![Fw => "Port", "Protocol", "Status", "Error"]);
     for domain_report in reports {
         let mut rows = vec![];
         let mut accessible = 0;
@@ -217,7 +217,7 @@ fn main() {
                         accessible += 1;
                     }
                     PortCheckStatus::Error(ref e) => {
-                        rows.push(row![
+                        rows.push(row![Fw =>
                             format!("{}", port_result.port),
                             format!("{}", port_result.protocol),
                             "inaccessible",
@@ -238,7 +238,8 @@ fn main() {
                              domain_report.port_range.min,
                              domain_report.port_range.max
                     )
-                ).with_hspan(4);
+                ).with_style(Attr::ForegroundColor(color::WHITE))
+                    .with_hspan(4);
                 if accessible == port_results.len() && !conf.disable_colors {
                     cell = cell.with_style(Attr::BackgroundColor(color::GREEN));
                 }
@@ -246,6 +247,7 @@ fn main() {
             }
             DomainCheckStatus::Dead => {
                 let mut cell = Cell::new(&format!("{} (dead)", domain_report.url))
+                    .with_style(Attr::ForegroundColor(color::WHITE))
                     .with_hspan(4);
                 if !conf.disable_colors {
                     cell = cell.with_style(Attr::BackgroundColor(color::RED))
