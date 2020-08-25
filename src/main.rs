@@ -240,18 +240,16 @@ fn main() {
                     )
                 ).with_style(Attr::ForegroundColor(color::WHITE))
                     .with_hspan(4);
-                if accessible == port_results.len() && !conf.disable_colors {
+                if accessible == port_results.len() {
                     cell = cell.with_style(Attr::BackgroundColor(color::GREEN));
                 }
                 table.add_row(Row::new(vec![cell]));
             }
             DomainCheckStatus::Dead => {
-                let mut cell = Cell::new(&format!("{} (dead)", domain_report.url))
+                let cell = Cell::new(&format!("{} (dead)", domain_report.url))
                     .with_style(Attr::ForegroundColor(color::WHITE))
+                    .with_style(Attr::BackgroundColor(color::RED))
                     .with_hspan(4);
-                if !conf.disable_colors {
-                    cell = cell.with_style(Attr::BackgroundColor(color::RED))
-                }
                 table.add_row(Row::new(vec![cell]));
             }
         };
@@ -260,6 +258,11 @@ fn main() {
             table.add_row(r);
         }
     }
+
+    if conf.disable_colors {
+        table.row_iter_mut().for_each(|r| r.iter_mut().for_each(|c| c.reset_style()));
+    }
+
     table.printstd();
 
     if let Some(path) = conf.out {
